@@ -1,0 +1,15 @@
+DllCharacteristics
+DebugSize
+MajorLinkerVersion
+MajorOSVersion
+DebugRVA
+ResourceSize
+Machine
+SizeOfStackReserve
+IatVRA
+NumberOfSections
+MajorImageVersion
+ExportSize
+MinorLinkerVersion
+ExportRVA
+BitcoinAddresses

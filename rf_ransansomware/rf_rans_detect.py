@@ -1,4 +1,3 @@
-import requests
 import numpy as np
 import joblib  # For loading the model with joblib
 import re
@@ -101,22 +100,32 @@ def extract_features_from_file(filepath):
     return np.array(features).reshape(1, -1)
 
 # Function to classify a file as ransomware or safe
+# Function to classify a file as ransomware or safe
+# Function to classify a file as ransomware or safe
 def detect_ransomware_from_file(filepath):
-    features = extract_features_from_file(filepath)
-    
-    # Manual override for procexp.exe
-    if "Jigsaw.exe" in filepath:
-        print("Safe: This file is classified as safe (manual override).")
+    if not os.path.isfile(filepath):
+        print(f"File not found: {filepath}")
         return
 
+    features = extract_features_from_file(filepath)
     prediction = model.predict(features)
-    if prediction[0] == 1:
-        print("Warning: This file is classified as ransomware.")
-    else:
-        print("Safe: This file is classified as safe.")
+    prediction_probabilities = model.predict_proba(features)
 
-# Use the local procexp.exe for testing
-file_path = os.path.join(os.getcwd(), "procexp.exe")
+    print(f"Prediction: {prediction[0]} (1: ransomware, 0: safe)")
+    print(f"Prediction Probabilities: {prediction_probabilities}")
+
+    # Here we use the probabilities to make a decision
+    safe_threshold = 0.5  # You can adjust this threshold if needed
+
+    if prediction_probabilities[0][1] >= safe_threshold:
+        print("Safe: This file is classified as safe.")
+    else:
+        print("Warning: This file is classified as ransomware.")
+
+
+
+# Path to the executable you want to test
+file_path = input("Enter the full path to the executable to analyze: ")
 
 # Run the ransomware detection on the executable
 print("Analyzing the file for ransomware...")

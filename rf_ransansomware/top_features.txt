@@ -1,13 +1,13 @@
 DllCharacteristics
+DebugRVA
 MajorLinkerVersion
 DebugSize
-DebugRVA
-ResourceSize
 MajorOSVersion
-SizeOfStackReserve
-NumberOfSections
+ResourceSize
 Machine
+SizeOfStackReserve
 IatVRA
+NumberOfSections
 MajorImageVersion
 ExportSize
 MinorLinkerVersion

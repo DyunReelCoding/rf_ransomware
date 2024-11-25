@@ -1,0 +1,10 @@
+{
+    "name": "ransomware_detector",
+    "description": "Detects ransomware in EXE files",
+    "path": "/home/jonriel/Documents/randomforest_Ransomware/extension/app/app.py",
+    "type": "stdio",
+    "allowed_extensions": [
+      "hghdkkhnapomeieicpdimfolpkkpaiko"
+    ]
+  }
+  

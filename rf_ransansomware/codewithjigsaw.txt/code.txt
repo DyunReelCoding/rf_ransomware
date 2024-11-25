@@ -124,3 +124,5 @@ file_path = os.path.join(os.getcwd(), "procexp.exe")
 # Run the ransomware detection on the downloaded file
 print("Analyzing the file for ransomware...")
 detect_ransomware_from_file(file_path)
+
+/home/jonriel/Documents/randomforest_Ransomware/Jigsaw.exe

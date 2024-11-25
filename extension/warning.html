@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ransomware Detected</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    .warning {
+      color: red;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .file-name {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    .buttons {
+      margin-top: 20px;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="warning">Warning: Ransomware Detected!</div>
+  <div class="file-name" id="file-name"></div>
+  <div class="buttons">
+    <button onclick="handleDelete()">Delete File</button>
+    <button onclick="handleKeep()">Keep File</button>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileName = urlParams.get('file');
+    document.getElementById('file-name').textContent = `File: ${fileName}`;
+
+    function handleDelete() {
+      chrome.runtime.sendMessage({ action: 'deleteFile', file: fileName }, function(response) {
+        if (response.success) {
+          alert('File deleted successfully.');
+          window.close();
+        } else {
+          alert('Failed to delete file.');
+        }
+      });
+    }
+
+    function handleKeep() {
+      alert('File kept.');
+      window.close();
+    }
+  </script>
+</body>
+</html>

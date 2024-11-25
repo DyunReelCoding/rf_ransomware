@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ransomware Detector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 300px;
+      padding: 10px;
+    }
+    h1 {
+      font-size: 20px;
+      text-align: center;
+    }
+    p {
+      font-size: 14px;
+      text-align: center;
+    }
+    .button {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+      padding: 10px;
+      background-color: #0078d4;
+      color: white;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #005a9e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ransomware Detector</h1>
+  <p>Monitoring your downloads for ransomware threats.</p>
+  <button class="button" id="settings">Settings</button>
+  <button class="button" id="check">Check Manually</button>
+
+  <script>
+    document.getElementById('settings').addEventListener('click', function() {
+      alert('Settings button clicked!'); // Replace this with actual functionality
+    });
+
+    document.getElementById('check').addEventListener('click', function() {
+      alert('Manual check button clicked!'); // Replace this with actual functionality
+    });
+  </script>
+</body>
+</html>

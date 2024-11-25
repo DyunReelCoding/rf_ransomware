@@ -1,5 +1,5 @@
 import numpy as np
-import joblib  # For loading the model with joblib
+import joblib  
 import re
 import pefile
 import os
@@ -100,8 +100,6 @@ def extract_features_from_file(filepath):
     return np.array(features).reshape(1, -1)
 
 # Function to classify a file as ransomware or safe
-# Function to classify a file as ransomware or safe
-# Function to classify a file as ransomware or safe
 def detect_ransomware_from_file(filepath):
     if not os.path.isfile(filepath):
         print(f"File not found: {filepath}")
@@ -114,8 +112,8 @@ def detect_ransomware_from_file(filepath):
     print(f"Prediction: {prediction[0]} (1: ransomware, 0: safe)")
     print(f"Prediction Probabilities: {prediction_probabilities}")
 
-    # Here we use the probabilities to make a decision
-    safe_threshold = 0.5  # You can adjust this threshold if needed
+    #probabilities to make a decision
+    safe_threshold = 0.5 
 
     if prediction_probabilities[0][1] >= safe_threshold:
         print("Safe: This file is classified as safe.")
@@ -124,7 +122,7 @@ def detect_ransomware_from_file(filepath):
 
 
 
-# Path to the executable you want to test
+# Path to the executable to test
 file_path = input("Enter the full path to the executable to analyze: ")
 
 # Run the ransomware detection on the executable

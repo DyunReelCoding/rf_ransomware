@@ -121,24 +121,22 @@ def detect_ransomware_from_file(filepath):
         print("Safe: This file is classified as safe.")
         return "safe"
 
-# API route to detect ransomware
+# API route to detect ransomware via file path
 @app.route('/detect_ransomware', methods=['POST'])
 def detect_ransomware():
-    file = request.files['file']
-    if file:
-        file_path = os.path.join("/tmp", file.filename)
-        file.save(file_path)
+    data = request.get_json()
+    file_path = data.get("file_path")
+    if not file_path:
+        return jsonify({"error": "No file path provided"}), 400
 
-        # Use the detect_ransomware_from_file function
-        result = detect_ransomware_from_file(file_path)
-
-        # Return the result as a JSON response
+    result = detect_ransomware_from_file(file_path)
+    if result:
         return jsonify({
             "file_status": result,
             "message": "File classified successfully."
         })
+    else:
+        return jsonify({"error": "File not found or processing error"}), 400
 
-    return jsonify({"error": "No file provided"}), 400
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)

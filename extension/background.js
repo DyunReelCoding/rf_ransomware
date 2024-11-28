@@ -1,70 +1,88 @@
-chrome.downloads.onChanged.addListener((delta) => {
-  if (delta.state && delta.state.current === "complete") {
-    chrome.downloads.search({ id: delta.id }, (results) => {
-      if (results.length === 0) {
-        return;
-      }
+const serverUrl = "http://localhost:5000/detect_ransomware";
+const downloadDir = "/home/jonriel/Downloads";
+let currentRansomwareFile = null;
 
-      const filePath = results[0].filename;
-      const fileName = filePath.split('/').pop();
+// Monitor downloads
+chrome.downloads.onChanged.addListener((downloadDelta) => {
+  if (downloadDelta.state && downloadDelta.state.current === "complete") {
+    chrome.downloads.search({ id: downloadDelta.id }, (results) => {
+      if (results && results[0]) {
+        const filePath = results[0].filename;
 
-      chrome.fileSystem.chooseEntry({ type: 'openFile', accepts: [{ extensions: ['exe'] }] }, async (entry) => {
-        try {
-          const fileContent = await readFileContent(entry);
-          const blob = new Blob([fileContent], { type: 'application/octet-stream' });
-
-          const formData = new FormData();
-          formData.append('file', blob, fileName);
-
-          const response = await fetch('http://localhost:5000/detect_ransomware', {
-            method: 'POST',
-            body: formData
-          });
-
-          const data = await response.json();
-          if (data.file_status === "ransomware") {
-            const notificationId = "ransomware_detected_" + Math.random().toString(36).substring(7);
-
-            chrome.notifications.create(notificationId, {
-              type: "basic",
-              iconUrl: "icon48.png",
-              title: "Ransomware Detected!",
-              message: `The file "${fileName}" is classified as ransomware. What would you like to do?`,
-              buttons: [
-                { title: "Delete File" },
-                { title: "Keep File" }
-              ],
-              requireInteraction: true
-            });
-
-            chrome.notifications.onButtonClicked.addListener((notifId, btnIdx) => {
-              if (notifId === notificationId) {
-                if (btnIdx === 0) {
-                  chrome.downloads.removeFile(results[0].id, () => {
-                    console.log(`File ${fileName} deleted.`);
-                  });
-                } else if (btnIdx === 1) {
-                  console.log(`File ${fileName} kept.`);
-                }
-                chrome.notifications.clear(notificationId);
-              }
-            });
-          }
-        } catch (error) {
-          console.error("Error processing file:", error);
+        // Check if the file is an .exe in the specified directory
+        if (filePath.startsWith(downloadDir) && filePath.endsWith(".exe")) {
+          console.log(`New .exe file detected: ${filePath}`);
+          processFile(filePath, results[0].id);
         }
-      });
+      }
     });
   }
 });
 
-async function readFileContent(entry) {
-  return new Promise((resolve, reject) => {
-    entry.file(file => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsArrayBuffer(file);
+// Function to send the file path to the Flask server
+function processFile(filePath, downloadId) {
+  fetch(serverUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ file_path: filePath }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((result) => {
+      if (result.file_status === "ransomware") {
+        console.warn(`Warning: The file ${filePath} is classified as ransomware.`);
+        currentRansomwareFile = filePath;
+
+        // Open the popup
+        chrome.windows.create({
+          url: "popup.html",
+          type: "popup",
+          width: 400,
+          height: 300,
+        });
+      } else {
+        console.log(`The file ${filePath} is safe.`);
+      }
+    })
+    .catch((error) => {
+      console.error("Error communicating with the Flask server:", error);
     });
+}
+
+// Listen for messages from the popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "getFilePath") {
+    sendResponse({ filePath: currentRansomwareFile });
+  } else if (message.action === "deleteFile") {
+    deleteFile(message.filePath);
+  } else if (message.action === "keepFile") {
+    console.log("User chose to keep the file.");
+  }
+});
+
+// Function to delete the ransomware file
+function deleteFile(filePath) {
+  // Search for the download ID by filename
+  chrome.downloads.search({ filename: filePath }, function (results) {
+    if (results && results[0]) {
+      const downloadId = results[0].id;
+
+      // Remove the file using chrome.downloads.removeFile()
+      chrome.downloads.removeFile(downloadId, function (success) {
+        if (success) {
+          console.log(`File deleted: ${filePath}`);
+        } else {
+          console.error(`Failed to delete file: ${filePath}`);
+        }
+      });
+    } else {
+      console.error(`File not found in downloads: ${filePath}`);
+    }
   });
 }

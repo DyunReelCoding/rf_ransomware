@@ -1,23 +1,20 @@
 {
   "manifest_version": 3,
-  "name": "Ransomware Detector",
+  "name": "Ransomware Detection",
+  "description": "Detect ransomware in downloaded files",
   "version": "1.0",
   "permissions": [
     "downloads",
     "notifications",
-    "storage",
-    "activeTab"
+    "fileSystem"
+  ],
+  "host_permissions": [
+    "http://localhost:5000/"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["warning.html"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  }
 }
